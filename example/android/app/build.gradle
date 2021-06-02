@@ -1,0 +1,77 @@
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+if (flutterRoot == null) {
+    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+apply plugin: 'com.android.application'
+apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
+android {
+    compileSdkVersion 30
+
+    defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId "com.example.package_channel_example"
+        minSdkVersion 16
+        targetSdkVersion 30
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+    }
+
+    buildTypes {
+        release {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    flavorDimensions "app"
+    // 渠道包定义，默认定义的名称就是渠道名称
+    productFlavors {
+
+        dev {} // 测试
+        baidu {}        // 百度手机助手
+        yinyongbao {}   // 应用宝
+        m360 {}         // 360手机助手
+        pp {}           // PP助手
+        anzhi{}         // 安智市场
+        xiaomi {}       // 小米商店
+        letv {}         // 乐视商店
+        huawei {}       // 华为商店
+        lenovomm {}     // 联想乐商店
+        other {}        // 其他市场
+        official{}      // 官方版本
+
+    }
+
+    // 批量渠道包值替换
+    productFlavors.all { flavor -> flavor.manifestPlaceholders = [CHANNEL_NAME: name]}
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+}
+
+flutter {
+    source '../..'
+}
